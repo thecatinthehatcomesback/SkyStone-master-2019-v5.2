@@ -63,7 +63,7 @@ public class CatDriveHW extends CatSubsystemHW
     static final double     TURN_SPEED              = 0.6;
 
 
-    ElapsedTime runtime = new ElapsedTime();
+    ElapsedTime runTime = new ElapsedTime();
     double      timeout = 0;
 
     int             targetAngleZ;
@@ -174,6 +174,8 @@ public class CatDriveHW extends CatSubsystemHW
         rightFrontMotor.setPower(rightFront);
         leftRearMotor.setPower(leftBack);
         rightRearMotor.setPower(rightBack);
+
+        Log.d("catbot", String.format("Drive Power  LF: %.2f, RF: %.2f, LB: %.2f, RB: %.2f", leftFront, rightFront, leftBack, rightBack));
     }
     public void resetEncoders(){
 
@@ -300,7 +302,7 @@ public class CatDriveHW extends CatSubsystemHW
             rightRearMotor.setTargetPosition(newRightBackTarget);
 
             // Reset the timeout time and start motion.
-            runtime.reset();
+            runTime.reset();
 
             // Negate the power if we are going backwards
             if (distance < 0) {
@@ -316,7 +318,7 @@ public class CatDriveHW extends CatSubsystemHW
          * This is a simpler mecanum drive method that drives blindly
          * straight horizontally (positive numbers should strafe left)
          */
-        Log.d("catbot", String.format(" Started drive horiizontal pow: %.2f, dist: %.2f, time:%.2f ",power,distance, timeoutS));
+        Log.d("catbot", String.format(" Started drive horizontal pow: %.2f, dist: %.2f, time:%.2f ",power,distance, timeoutS));
 
         currentMethod = DRIVE_METHOD.horizontal;
         timeout = timeoutS;
@@ -345,16 +347,15 @@ public class CatDriveHW extends CatSubsystemHW
             rightRearMotor.setTargetPosition(newRightBackTarget);
 
             // Reset the timeout time and start motion.
-            runtime.reset();
+            runTime.reset();
 
             // Negate the power if we are going right
             if (distance < 0) {
                 power = -power;
             }
 
-            // Due to weight diffence, we compensate by cutting the back wheels half power
+            // Due to the differences in weight on each wheel, adjust powers accordingly
             drive(power, power, power, power);
-
         }
     }
     public void advMecDrive(double power, double vectorDistance,
@@ -403,7 +404,7 @@ public class CatDriveHW extends CatSubsystemHW
             rightRearMotor.setTargetPosition(newRightBackTarget);
 
             // Reset the timeout time and start motion.
-            runtime.reset();
+            runTime.reset();
 
             // Negate the power if we are going backwards
             if (vectorDistance < 0) {
@@ -420,7 +421,7 @@ public class CatDriveHW extends CatSubsystemHW
             drive(leftFrontMod, rightFrontMod, leftBackMod, rightBackMod);
 
             while (opMode.opModeIsActive() &&
-                    (runtime.seconds() < timeoutS) &&
+                    (runTime.seconds() < timeoutS) &&
                     keepDriving) {
 
                 // Find the current positions so that we can display it later
@@ -441,7 +442,7 @@ public class CatDriveHW extends CatSubsystemHW
                 opMode.telemetry.addData("Current Path",  "Running at :%7d :%7d :%7d :%7d",
                         leftFrontPosition, rightFrontPosition, leftBackPosition, rightBackPosition);
                 opMode.telemetry.addData("Power: ", "%.3f", power);
-                opMode.telemetry.addData("Time: ","%.4f seconds", runtime.seconds());
+                opMode.telemetry.addData("Time: ","%.4f seconds", runTime.seconds());
                 opMode.telemetry.update();
             }
 
@@ -471,7 +472,7 @@ public class CatDriveHW extends CatSubsystemHW
             // Don't use encoders.  We only use the gyro angle to turn
             runNoEncoders();
             // reset the timeout time and start motion.
-            runtime.reset();
+            runTime.reset();
             Log.d("catbot", String.format("Start turn...  target %d, current %d  %s", -targetAngleZ, -getCurrentAngle(), clockwiseTurn ?"CW":"CCW"));
 
 
@@ -539,7 +540,7 @@ public class CatDriveHW extends CatSubsystemHW
     @Override
     public boolean isDone() {
         boolean keepDriving = true;
-        if ((runtime.seconds() > timeout)) {
+        if ((runTime.seconds() > timeout)) {
             keepDriving = false;
         }
         switch (currentMethod){
@@ -590,13 +591,14 @@ public class CatDriveHW extends CatSubsystemHW
 
                     keepDriving = false;
                 }
-                Log.d("catbot", String.format("DriveHor LF: %d, %d;  RF: %d, %d;  LB: %d, %d;  RB %d,%d",
-                        leftFrontMotor.getTargetPosition(),leftFrontMotor.getCurrentPosition(),
-                        rightFrontMotor.getTargetPosition(), rightFrontMotor.getCurrentPosition(),
-                        leftRearMotor.getTargetPosition(), leftRearMotor.getCurrentPosition(),
-                        rightRearMotor.getTargetPosition(), rightRearMotor.getCurrentPosition()));
+                Log.d("catbot", String.format("DriveHor LF: %d, %d, %.2f;  RF: %d, %d, %.2f;  LB: %d, %d, %.2f;  RB %d,%d, %.2f",
+                        leftFrontMotor.getTargetPosition(),leftFrontMotor.getCurrentPosition(),  leftFrontMotor.getPower(),
+                        rightFrontMotor.getTargetPosition(), rightFrontMotor.getCurrentPosition(), rightFrontMotor.getPower(),
+                        leftRearMotor.getTargetPosition(), leftRearMotor.getCurrentPosition(), leftRearMotor.getPower(),
+                        rightRearMotor.getTargetPosition(), rightRearMotor.getCurrentPosition(), rightRearMotor.getPower()));
 
                 break;
+
             case turn:
 
                 int zVal = getCurrentAngle();
@@ -610,10 +612,9 @@ public class CatDriveHW extends CatSubsystemHW
                     keepDriving = false;
                 }
                 break;
-
         }
 
-        if (!(keepDriving)){
+        if (!keepDriving){
             // Stop all motion;
             drive(0, 0, 0, 0);
             isDone = true;
