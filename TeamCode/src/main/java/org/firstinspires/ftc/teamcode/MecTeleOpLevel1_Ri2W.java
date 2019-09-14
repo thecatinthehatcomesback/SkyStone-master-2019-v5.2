@@ -16,8 +16,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-@TeleOp(name="TeleOp", group="CatTeleOp")
-
+@TeleOp(name="Ri2W TeleOp", group="CatTeleOp")
 public class MecTeleOpLevel1_Ri2W extends LinearOpMode {
 
     /* Declare OpMode members. */

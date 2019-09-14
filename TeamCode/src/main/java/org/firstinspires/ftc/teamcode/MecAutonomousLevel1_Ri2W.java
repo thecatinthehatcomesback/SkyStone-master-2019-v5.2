@@ -27,7 +27,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-//@Disabled
 @Autonomous(name="Ri2W Autonomous", group="CatAuto")
 public class MecAutonomousLevel1_Ri2W extends LinearOpMode {
 
