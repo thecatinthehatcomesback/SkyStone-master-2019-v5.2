@@ -24,7 +24,7 @@ public class MecTeleOpLevel1_Ri2W extends LinearOpMode {
 
     /* Declare OpMode members. */
     CatAsyncHW robot = new CatAsyncHW();  // Use our new mecanum async hardware
-    boolean inReverse           = true;
+
 
     // Our constructor for this class
     public MecTeleOpLevel1_Ri2W() {
@@ -83,7 +83,7 @@ public class MecTeleOpLevel1_Ri2W extends LinearOpMode {
 
             // Robot Drive-Direction Selection
             if (gamepad1.dpad_up){
-                inReverse = false;
+
                 if(robot.isRedAlliance) {
                     robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SHOT_RED);
                 } else {
@@ -91,7 +91,7 @@ public class MecTeleOpLevel1_Ri2W extends LinearOpMode {
                 }
             }
             if (gamepad1.dpad_down) {
-                inReverse = true;
+
                 if(robot.isRedAlliance) {
                     robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_LAVA_PALETTE);
                 } else {
@@ -100,17 +100,12 @@ public class MecTeleOpLevel1_Ri2W extends LinearOpMode {
             }
 
             // Input for drive train
-            if (inReverse) {
-                leftFront  = gamepad1.right_stick_y - gamepad1.right_stick_x + gamepad1.left_stick_x;
-                rightFront = gamepad1.right_stick_y + gamepad1.right_stick_x - gamepad1.left_stick_x;
-                leftBack   = gamepad1.right_stick_y + gamepad1.right_stick_x + gamepad1.left_stick_x;
-                rightBack  = gamepad1.right_stick_y - gamepad1.right_stick_x - gamepad1.left_stick_x;
-            } else {
-                leftFront  = -gamepad1.right_stick_y + gamepad1.right_stick_x + gamepad1.left_stick_x;
-                rightFront = -gamepad1.right_stick_y - gamepad1.right_stick_x - gamepad1.left_stick_x;
-                leftBack   = -gamepad1.right_stick_y - gamepad1.right_stick_x + gamepad1.left_stick_x;
-                rightBack  = -gamepad1.right_stick_y + gamepad1.right_stick_x - gamepad1.left_stick_x;
-            }
+
+            leftFront  = -gamepad1.right_stick_y + gamepad1.right_stick_x + gamepad1.left_stick_x;
+            rightFront = -gamepad1.right_stick_y - gamepad1.right_stick_x - gamepad1.left_stick_x;
+            leftBack   = -gamepad1.right_stick_y - gamepad1.right_stick_x + gamepad1.left_stick_x;
+            rightBack  = -gamepad1.right_stick_y + gamepad1.right_stick_x - gamepad1.left_stick_x;
+
 
 
             // Calculate the scale factor
@@ -137,12 +132,13 @@ public class MecTeleOpLevel1_Ri2W extends LinearOpMode {
 
 
             // Open/Close gate
-            if(gamepad2.left_bumper) {
-                //robot.intake.gateClose();
-            } else if (gamepad2.right_bumper) {
-                //robot.intake.gateOpen();
+            if(gamepad1.dpad_up) {
+                robot.tail.releaseFoundation();
+            } else if (gamepad1.dpad_down) {
+                robot.tail.grabFoundation();
             }
-
+            //control the intake
+            robot.intake.intakeMotor.setPower(gamepad1.left_trigger -gamepad1.right_trigger);
 
 
             /**
@@ -154,6 +150,7 @@ public class MecTeleOpLevel1_Ri2W extends LinearOpMode {
             telemetry.addData("Right Front Power:", "%.2f", rightFront);
             telemetry.addData("Left Back Power:", "%.2f", leftBack);
             telemetry.addData("Right Back Power:", "%.2f", rightBack);
+            telemetry.addData("intake","%.2f", robot.intake.intakeMotor.getPower());
             telemetry.update();
         }
     }

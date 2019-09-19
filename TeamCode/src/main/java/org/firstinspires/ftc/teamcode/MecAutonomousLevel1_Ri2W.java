@@ -142,18 +142,30 @@ public class MecAutonomousLevel1_Ri2W extends LinearOpMode {
 
         /* Go! */
         // Drive to Foundation
-        robot.drive.mecDriveVertical(CatDriveHW.DRIVE_SPEED, -18, 3.0);
+        robot.drive.mecDriveVertical(CatDriveHW.CHILL_SPEED, -30, 3.0);
         robot.drive.waitUntilDone();
         robot.robotWait(1);
         // Latch on
         robot.tail.grabFoundation();
         robot.tail.waitUntilDone();
+        robot.robotWait(2);
         // Drive back to Building Zone
-        robot.drive.mecDriveVertical(CatDriveHW.DRIVE_SPEED, 18, 3.0);
+        robot.drive.mecDriveVertical(CatDriveHW.CHILL_SPEED, 30, 3.0);
         robot.drive.waitUntilDone();
+        robot.drive.mecDriveVertical(CatDriveHW.CHILL_SPEED,4,1);
         robot.robotWait(1);
+        robot.tail.releaseFoundation();
+        robot.robotWait(2);
         // Slide out to line
-        robot.drive.mecDriveHorizontal(CatDriveHW.DRIVE_SPEED,30, 5.0);
+        robot.drive.mecDriveHorizontal(CatDriveHW. CHILL_SPEED,-22, 5.0);
+        robot.drive.waitUntilDone();
+        robot.drive.mecDriveVertical(CatDriveHW.CHILL_SPEED, -18, 2);
+        robot.drive.waitUntilDone();
+        robot.drive.mecDriveHorizontal(CatDriveHW.CHILL_SPEED,8,1);
+        robot.drive.waitUntilDone();
+        robot.drive.mecDriveVertical(CatDriveHW.CHILL_SPEED,-5,1);
+        robot.drive.waitUntilDone();
+        robot.drive.mecDriveHorizontal(CatDriveHW.CHILL_SPEED,-20,2);
         robot.drive.waitUntilDone();
 
     }

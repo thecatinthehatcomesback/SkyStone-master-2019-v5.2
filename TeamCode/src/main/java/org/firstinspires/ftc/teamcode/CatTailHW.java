@@ -15,6 +15,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.Servo;
 
 /**
  * This is NOT an OpMode.
@@ -38,7 +39,8 @@ public class CatTailHW extends CatSubsystemHW
 
 
     /* Public OpMode members. */
-
+    public Servo tailLeft = null;
+    public Servo tailRight = null;
 
 
     /* local OpMode members. */
@@ -54,7 +56,8 @@ public class CatTailHW extends CatSubsystemHW
 
     /* Initialize standard Hardware interfaces */
     public void init()  throws InterruptedException  {
-
+        tailLeft = hwMap.servo.get("left_tail");
+        tailRight = hwMap.servo.get("right_tail");
     }
 
     /**
@@ -63,10 +66,12 @@ public class CatTailHW extends CatSubsystemHW
      * ---   \/ \/ \/ \/    ---
      */
     public void grabFoundation() {
-
+        tailLeft.setPosition(.4);
+        tailRight.setPosition(0.4 );
     }
     public void releaseFoundation() {
-
+        tailLeft.setPosition(0);
+        tailRight.setPosition(1.0);
     }
 
 
