@@ -171,6 +171,19 @@ public class MecAutonomousLevel1_Ri2W extends LinearOpMode {
         }
     }
     public void driveLoadingZone() throws InterruptedException {
+        // Open intake and start driving forwards towards stone
+
+        // Drive forward a bit more but slower
+
+        // Close intake
+
+        // Turn towards Building Zone
+
+        // Drive completely across the taped line
+
+        // Spit block out
+
+        // Navigate (Park over taped line)
 
     }
     public void driveBuildZone() throws InterruptedException {

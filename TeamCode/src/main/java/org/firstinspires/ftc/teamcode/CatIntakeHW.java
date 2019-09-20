@@ -68,7 +68,7 @@ public class CatIntakeHW extends CatSubsystemHW
     }
 
 
-    public void pacManMonster() {
+    public void pacManStoneEater() {
         /**
          * During autonomous, we use this to turn on the
          * intake and eat the stones!
