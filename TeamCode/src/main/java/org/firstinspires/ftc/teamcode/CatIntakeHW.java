@@ -37,6 +37,11 @@ public class CatIntakeHW extends CatSubsystemHW
 {
 
     /* Public OpMode members. */
+    static final int MOUTH_CLOSE = 0;
+    static final int MOUTH_OPEN = -40;
+    static final int MOUTH_LATCH = -125;
+    static final int MOUTH_RELEASE = 80;
+
 
     // Motors:
     public DcMotor intakeMotor = null;

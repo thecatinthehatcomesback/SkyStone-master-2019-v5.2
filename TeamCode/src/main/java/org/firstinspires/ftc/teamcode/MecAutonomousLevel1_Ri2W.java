@@ -26,6 +26,10 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import static org.firstinspires.ftc.teamcode.CatIntakeHW.MOUTH_CLOSE;
+import static org.firstinspires.ftc.teamcode.CatIntakeHW.MOUTH_OPEN;
+import static org.firstinspires.ftc.teamcode.CatIntakeHW.MOUTH_RELEASE;
+
 
 @Autonomous(name="Ri2W Autonomous", group="CatAuto")
 public class MecAutonomousLevel1_Ri2W extends LinearOpMode {
@@ -172,18 +176,32 @@ public class MecAutonomousLevel1_Ri2W extends LinearOpMode {
     }
     public void driveLoadingZone() throws InterruptedException {
         // Open intake and start driving forwards towards stone
-
+        robot.intake.intakeMotor.setTargetPosition(MOUTH_OPEN);
+        robot.drive.mecDriveVertical(CatDriveHW.CHILL_SPEED, 20, 2);
+        robot.drive.waitUntilDone();
         // Drive forward a bit more but slower
-
+        robot.drive.mecDriveVertical(CatDriveHW.CREEP_SPEED, 10, 3);
+        robot.drive.waitUntilDone();
         // Close intake
-
+        robot.intake.intakeMotor.setTargetPosition(MOUTH_CLOSE);
+        robot.intake.waitUntilDone();
+        //back up from stones
+        robot.drive.mecDriveVertical(CatDriveHW.CHILL_SPEED, -20, 2);
+        robot.drive.waitUntilDone();
         // Turn towards Building Zone
-
+        robot.drive.mecDriveHorizontal(CatDriveHW.DRIVE_SPEED,60, 6);
+        robot.drive.waitUntilDone();
         // Drive completely across the taped line
 
         // Spit block out
-
+        robot.intake.intakeMotor.setTargetPosition(MOUTH_RELEASE);
+        robot.intake.waitUntilDone();
+        //back up from stone
+        robot.drive.mecDriveVertical(CatDriveHW.CREEP_SPEED, 3, 1);
+        robot.drive.waitUntilDone();
         // Navigate (Park over taped line)
+        robot.drive.mecDriveHorizontal(CatDriveHW.CHILL_SPEED,15, 3);
+        robot.drive.waitUntilDone();
 
     }
     public void driveBuildZone() throws InterruptedException {
