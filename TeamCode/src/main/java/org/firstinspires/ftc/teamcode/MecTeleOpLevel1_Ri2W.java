@@ -62,6 +62,7 @@ public class MecTeleOpLevel1_Ri2W extends LinearOpMode {
         double leftBack;
         double rightBack;
         double SF;
+        double intakeSpeed;
 
         // Run infinitely until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
@@ -78,7 +79,7 @@ public class MecTeleOpLevel1_Ri2W extends LinearOpMode {
             } else if (gamepad1.right_bumper) {
                 driveSpeed = 0.4;
             } else {
-                driveSpeed = 0.6;
+                driveSpeed = 0.7;
             }
 
             // Robot Drive-Direction Selection
@@ -99,12 +100,20 @@ public class MecTeleOpLevel1_Ri2W extends LinearOpMode {
                 }
             }
 
-            // Input for drive train
 
-            leftFront  = -gamepad1.right_stick_y + gamepad1.right_stick_x + gamepad1.left_stick_x;
-            rightFront = -gamepad1.right_stick_y - gamepad1.right_stick_x - gamepad1.left_stick_x;
-            leftBack   = -gamepad1.right_stick_y - gamepad1.right_stick_x + gamepad1.left_stick_x;
-            rightBack  = -gamepad1.right_stick_y + gamepad1.right_stick_x - gamepad1.left_stick_x;
+            // Input for drive train and sets the dead-zones
+            leftFront  = -((Math.abs(gamepad1.right_stick_y) < 0.1) ? 0 : gamepad1.right_stick_y) +
+                    ((Math.abs(gamepad1.right_stick_x) < 0.1) ? 0 : gamepad1.right_stick_x) +
+                    gamepad1.left_stick_x;
+            rightFront = -((Math.abs(gamepad1.right_stick_y) < 0.1) ? 0 : gamepad1.right_stick_y) -
+                    ((Math.abs(gamepad1.right_stick_x) < 0.1) ? 0 : gamepad1.right_stick_x) -
+                    gamepad1.left_stick_x;
+            leftBack   = -((Math.abs(gamepad1.right_stick_y) < 0.1) ? 0 : gamepad1.right_stick_y) -
+                    ((Math.abs(gamepad1.right_stick_x) < 0.1) ? 0 : gamepad1.right_stick_x) +
+                    gamepad1.left_stick_x;
+            rightBack  = -((Math.abs(gamepad1.right_stick_y) < 0.1) ? 0 : gamepad1.right_stick_y) +
+                    ((Math.abs(gamepad1.right_stick_x) < 0.1) ? 0 : gamepad1.right_stick_x) -
+                    gamepad1.left_stick_x;
 
 
 
@@ -128,17 +137,26 @@ public class MecTeleOpLevel1_Ri2W extends LinearOpMode {
              * ---   \/ \/ \/ \/ \/ \/   ---
              */
 
-            // Intake Spinning Controls
+            // Intake Spinning Controls //
 
-
-            // Open/Close gate
-            if(gamepad1.dpad_up) {
-                robot.tail.releaseFoundation();
-            } else if (gamepad1.dpad_down) {
-                robot.tail.grabFoundation();
+            // Drive speed adjustments
+            if (gamepad2.left_bumper) {
+                intakeSpeed = 1;
+            } else if (gamepad2.right_bumper) {
+                intakeSpeed = 0.4;
+            } else {
+                intakeSpeed = 0.7;
             }
-            //control the intake
-            robot.intake.intakeMotor.setPower(gamepad1.left_trigger -gamepad1.right_trigger);
+            // Control the spinning intake
+            robot.intake.intakeMotor.setPower(intakeSpeed * -gamepad2.left_stick_y);
+
+
+            // Open/Close Foundation Fingers //
+            if(gamepad2.y) {
+                robot.tail.releaseFoundationFingers();
+            } else if (gamepad2.x) {
+                robot.tail.grabFoundationFingers();
+            }
 
 
             /**

@@ -65,11 +65,11 @@ public class CatTailHW extends CatSubsystemHW
      * ---   Tail Methods   ---
      * ---   \/ \/ \/ \/    ---
      */
-    public void grabFoundation() {
+    public void grabFoundationFingers() {
         tailLeft.setPosition(.4);
         tailRight.setPosition(0.4 );
     }
-    public void releaseFoundation() {
+    public void releaseFoundationFingers() {
         tailLeft.setPosition(0);
         tailRight.setPosition(1.0);
     }
