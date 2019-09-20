@@ -177,7 +177,7 @@ public class MecAutonomousLevel1_Ri2W extends LinearOpMode {
     public void driveLoadingZone() throws InterruptedException {
         // Open intake and start driving forwards towards stone
         robot.intake.intakeMotor.setTargetPosition(MOUTH_OPEN);
-        robot.drive.mecDriveVertical(CatDriveHW.CHILL_SPEED, 20, 2);
+        robot.drive.mecDriveVertical(CatDriveHW.CHILL_SPEED, 25, 2);
         robot.drive.waitUntilDone();
         // Drive forward a bit more but slower
         robot.drive.mecDriveVertical(CatDriveHW.CREEP_SPEED, 10, 3);
@@ -186,21 +186,21 @@ public class MecAutonomousLevel1_Ri2W extends LinearOpMode {
         robot.intake.intakeMotor.setTargetPosition(MOUTH_CLOSE);
         robot.intake.waitUntilDone();
         //back up from stones
-        robot.drive.mecDriveVertical(CatDriveHW.CHILL_SPEED, -20, 2);
-        robot.drive.waitUntilDone();
-        // Turn towards Building Zone
-        robot.drive.mecDriveHorizontal(CatDriveHW.DRIVE_SPEED,60, 6);
+        robot.drive.mecDriveVertical(CatDriveHW.CHILL_SPEED, -14, 2);
         robot.drive.waitUntilDone();
         // Drive completely across the taped line
-
+        robot.drive.mecDriveHorizontal(CatDriveHW.DRIVE_SPEED,40, 6);
+        robot.drive.waitUntilDone();
         // Spit block out
         robot.intake.intakeMotor.setTargetPosition(MOUTH_RELEASE);
         robot.intake.waitUntilDone();
+        robot.drive.mecDriveVertical(CatDriveHW.CREEP_SPEED,10, 4);
+        robot.drive.waitUntilDone();
         //back up from stone
-        robot.drive.mecDriveVertical(CatDriveHW.CREEP_SPEED, 3, 1);
+        robot.drive.mecDriveVertical(CatDriveHW.CREEP_SPEED, -6, 1);
         robot.drive.waitUntilDone();
         // Navigate (Park over taped line)
-        robot.drive.mecDriveHorizontal(CatDriveHW.CHILL_SPEED,15, 3);
+        robot.drive.mecDriveHorizontal(CatDriveHW.CHILL_SPEED,-15, 3);
         robot.drive.waitUntilDone();
 
     }
