@@ -14,6 +14,8 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -37,10 +39,10 @@ public class CatIntakeHW extends CatSubsystemHW
 {
 
     /* Public OpMode members. */
-    static final int MOUTH_CLOSE = 0;
-    static final int MOUTH_OPEN = -40;
+    static final int MOUTH_CLOSE = -140;
+    static final int MOUTH_OPEN = -62;
     static final int MOUTH_LATCH = -125;
-    static final int MOUTH_RELEASE = 80;
+    static final int MOUTH_RELEASE = 150;
 
 
     // Motors:
@@ -72,6 +74,14 @@ public class CatIntakeHW extends CatSubsystemHW
         intakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
+    public void intakeMove(int target) {
+        intakeMotor.setTargetPosition(target);
+        intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        runtime.reset();
+        intakeMotor.setPower(0.5);
+        isDone();
+        intakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
 
     public void pacManStoneEater() {
         /**
@@ -85,6 +95,8 @@ public class CatIntakeHW extends CatSubsystemHW
     static  double TIMEOUT = 3.0;
     @Override
     public boolean isDone() {
+        Log.d("catbot", String.format("intake power %.2f,",intakeMotor.getPower()));
+        Log.i("catbot", String.format("intake encoder " + intakeMotor.getCurrentPosition()));
         return !(intakeMotor.isBusy() && (runtime.seconds() < TIMEOUT));
     }
 }// End of class bracket

@@ -129,24 +129,25 @@ public class MecTeleOpLevel1_Ri2W extends LinearOpMode {
             } else {
                 intakeSpeed = 0.4;
             }
-            // Control the spinning intake:
-            robot.intake.intakeMotor.setPower(intakeSpeed * gamepad2.left_stick_y);
+
             if (gamepad2.right_stick_button) {
                 autoIntake = true;
-                elapsedTime.reset();
+                robot.intake.runtime.reset();
                 robot.intake.intakeMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 robot.intake.intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                robot.intake.intakeMotor.setPower(CHILL_SPEED);
+                robot.intake.intakeMotor.setTargetPosition(-125);
             }
             if (autoIntake) {
-                robot.intake.intakeMotor.setPower(CHILL_SPEED);
-                robot.intake.intakeMotor.setTargetPosition(-90);
-                robot.intake.waitUntilDone();
-                if (elapsedTime.seconds() > 1.5) {
+                if (robot.intake.isDone()) {
                     autoIntake = false;
                     robot.intake.intakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 }
             }
-
+            else{
+                // Control the spinning intake:
+                robot.intake.intakeMotor.setPower(intakeSpeed * gamepad2.left_stick_y);
+            }
 
             // Open/Close Foundation Fingers:
             if(gamepad2.y) {
