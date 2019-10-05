@@ -70,6 +70,11 @@ public class MecTeleOpLevel1_Ri2W extends LinearOpMode {
         double intakeSpeed;
         boolean autoIntake = false;
 
+        CatPositionUpdate globalPositionUpdate = new CatPositionUpdate(robot.drive.leftOdometry, robot.drive.rightOdometry, robot.drive.backOdometry, robot.drive.ODO_COUNTS_PER_INCH, 75);
+        Thread positionThread = new Thread(globalPositionUpdate);
+        positionThread.start();
+
+
         // Run infinitely until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
@@ -167,6 +172,11 @@ public class MecTeleOpLevel1_Ri2W extends LinearOpMode {
             telemetry.addData("Left Back Power:", "%.2f", leftBack);
             telemetry.addData("Right Back Power:", "%.2f", rightBack);
             telemetry.addData("Intake Power:","%.2f", robot.intake.intakeMotor.getPower());
+
+            telemetry.addData("X Position","%.2f", globalPositionUpdate.returnXCoordinate() / robot.drive.ODO_COUNTS_PER_INCH);
+            telemetry.addData("Y Position", "%.2f",globalPositionUpdate.returnYCoordinate() / robot.drive.ODO_COUNTS_PER_INCH);
+            telemetry.addData("Orientation (Degrees)", "%.2f", globalPositionUpdate.returnOrientation());
+
             telemetry.addData("Intake Encoder:", robot.intake.intakeMotor.getCurrentPosition());
             telemetry.addData("left Encoder:", robot.drive.leftOdometry.getCurrentPosition());
             telemetry.addData("right Encoder:", robot.drive.rightOdometry.getCurrentPosition());
@@ -174,5 +184,6 @@ public class MecTeleOpLevel1_Ri2W extends LinearOpMode {
 
             telemetry.update();
         }
+        globalPositionUpdate.stop();
     }
 }

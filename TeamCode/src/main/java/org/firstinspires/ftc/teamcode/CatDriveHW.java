@@ -54,6 +54,9 @@ public class CatDriveHW extends CatSubsystemHW
     static final double     COUNTS_PER_MOTOR_REV    = 537.6;    // Accurate for a NeveRest Orbital 20
     static final double     WHEEL_DIAMETER_INCHES   = 4.0 ;     // For figuring circumference
     static final double     COUNTS_PER_INCH         = COUNTS_PER_MOTOR_REV / (WHEEL_DIAMETER_INCHES * 3.1415);
+    static final double     ODO_COUNTS_PER_REV        = 1440;     // 1440 for E4T from Andymark
+    static final double     ODO_WHEEL_DIAMETER_INCHES = 2.0 ;     // For figuring circumference
+    static final double     ODO_COUNTS_PER_INCH       = ODO_COUNTS_PER_REV / (ODO_WHEEL_DIAMETER_INCHES * 3.1415);
 
     /* Autonomous Drive Speeds */
     static final double     HYPER_SPEED             = 0.95;
@@ -157,6 +160,9 @@ public class CatDriveHW extends CatSubsystemHW
 
         // Set motor modes //
         runNoEncoders();
+        leftOdometry.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightOdometry.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backOdometry.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftOdometry.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightOdometry.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         backOdometry.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
