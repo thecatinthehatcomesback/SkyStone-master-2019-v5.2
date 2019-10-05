@@ -168,6 +168,10 @@ public class MecTeleOpLevel1_Ri2W extends LinearOpMode {
             telemetry.addData("Right Back Power:", "%.2f", rightBack);
             telemetry.addData("Intake Power:","%.2f", robot.intake.intakeMotor.getPower());
             telemetry.addData("Intake Encoder:", robot.intake.intakeMotor.getCurrentPosition());
+            telemetry.addData("left Encoder:", robot.drive.leftOdometry.getCurrentPosition());
+            telemetry.addData("right Encoder:", robot.drive.rightOdometry.getCurrentPosition());
+            telemetry.addData("back Encoder:", robot.drive.backOdometry.getCurrentPosition());
+
             telemetry.update();
         }
     }

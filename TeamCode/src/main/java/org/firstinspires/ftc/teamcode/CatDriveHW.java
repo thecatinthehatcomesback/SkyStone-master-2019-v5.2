@@ -109,6 +109,9 @@ public class CatDriveHW extends CatSubsystemHW
     public DcMotor  rightFrontMotor = null;
     public DcMotor  leftRearMotor   = null;
     public DcMotor  rightRearMotor  = null;
+    public DcMotor  rightOdometry  = null;
+    public DcMotor  leftOdometry = null;
+    public DcMotor backOdometry = null;
 
     /* LED stuff */
     public RevBlinkinLedDriver lights   = null;
@@ -131,6 +134,10 @@ public class CatDriveHW extends CatSubsystemHW
         rightFrontMotor  = hwMap.dcMotor.get("right_front_motor");
         leftRearMotor    = hwMap.dcMotor.get("left_rear_motor");
         rightRearMotor   = hwMap.dcMotor.get("right_rear_motor");
+        leftOdometry     = hwMap.dcMotor.get("left_odometry");
+        rightOdometry    = hwMap.dcMotor.get("right_odometry");
+        backOdometry     = hwMap.dcMotor.get("back_odometry");
+
 
         // Blinkin LED stuff //
         lights           = hwMap.get(RevBlinkinLedDriver.class, "blinky");
@@ -143,9 +150,16 @@ public class CatDriveHW extends CatSubsystemHW
         rightFrontMotor.setDirection(DcMotor.Direction.FORWARD);
         leftRearMotor.setDirection(DcMotor.Direction.FORWARD);
         rightRearMotor.setDirection(DcMotor.Direction.REVERSE);
+        leftOdometry.setDirection(DcMotor.Direction.FORWARD);
+        rightOdometry.setDirection(DcMotor.Direction.FORWARD);
+        backOdometry.setDirection(DcMotor.Direction.FORWARD);
+
 
         // Set motor modes //
         runNoEncoders();
+        leftOdometry.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightOdometry.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backOdometry.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         // Set all motors to run at no power so that the robot doesn't move during init //
         leftFrontMotor.setPower(0);
