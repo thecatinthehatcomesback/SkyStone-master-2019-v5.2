@@ -16,6 +16,7 @@ package org.firstinspires.ftc.teamcode;
 
 import android.util.Log;
 
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
@@ -69,6 +70,9 @@ public class CatDriveHW extends CatSubsystemHW
     ElapsedTime runTime = new ElapsedTime();
     double      timeout = 0;
 
+    double          targetx;
+    double          targety;
+    double          strafePower;
     int             targetAngleZ;
     int             baseDelta;
     boolean         clockwiseTurn;
@@ -80,7 +84,8 @@ public class CatDriveHW extends CatSubsystemHW
     enum DRIVE_METHOD {
         vertical,
         horizontal,
-        turn
+        turn,
+        strafe
     }
 
     enum DRIVE_MODE {
@@ -115,6 +120,8 @@ public class CatDriveHW extends CatSubsystemHW
     public DcMotor  rightOdometry  = null;
     public DcMotor  leftOdometry = null;
     public DcMotor backOdometry = null;
+
+    CatPositionUpdate globalPositionUpdate;
 
     /* LED stuff */
     public RevBlinkinLedDriver lights   = null;
@@ -153,6 +160,11 @@ public class CatDriveHW extends CatSubsystemHW
         rightFrontMotor.setDirection(DcMotor.Direction.FORWARD);
         leftRearMotor.setDirection(DcMotor.Direction.FORWARD);
         rightRearMotor.setDirection(DcMotor.Direction.REVERSE);
+        leftFrontMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFrontMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftRearMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightRearMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         leftOdometry.setDirection(DcMotor.Direction.FORWARD);
         rightOdometry.setDirection(DcMotor.Direction.FORWARD);
         backOdometry.setDirection(DcMotor.Direction.FORWARD);
@@ -177,6 +189,11 @@ public class CatDriveHW extends CatSubsystemHW
         // Sets enums to a default value
         currentMode = DRIVE_MODE.driveTilDistance;
         currentMethod = DRIVE_METHOD.vertical;
+
+        //odomentry setup
+        globalPositionUpdate = new CatPositionUpdate(leftOdometry, rightOdometry, backOdometry, ODO_COUNTS_PER_INCH, 75);
+        Thread positionThread = new Thread(globalPositionUpdate);
+        positionThread.start();
     }
 
 
@@ -522,6 +539,15 @@ public class CatDriveHW extends CatSubsystemHW
          }
     }
 
+    public void strafeDrive(double x, double y, double power, double timeoutS){
+
+        currentMethod = DRIVE_METHOD.strafe;
+        timeout = timeoutS;
+        isDone = false;
+        targetx = x;
+        targety = y;
+        strafePower = power;
+    }
     /**
      * ---   ___________   ---
      * ---   IMU Methods   ---
@@ -631,6 +657,31 @@ public class CatDriveHW extends CatSubsystemHW
                 if ((zVal <= targetAngleZ) && (clockwiseTurn)) {
                     keepDriving = false;
                 }
+                break;
+
+            case strafe:
+
+                // if is good to end
+                if (Math.abs(targety-globalPositionUpdate.returnYInches()) < 1 && Math.abs(targetx-globalPositionUpdate.returnXInches()) < 1) {
+
+                    keepDriving = false;
+                }
+
+                //calc angle
+                //double ang = (Math.atan2(targety - globalPositionUpdate.returnYInches(), targetx - globalPositionUpdate.returnXInches())) - globalPositionUpdate.returnOrientation();
+                double ang = 0.785398;
+                Log.d("catbot", String.format("move ang %f", ang ));
+
+                leftFrontMotor.setPower((Math.cos(ang) - Math.sin(ang))* strafePower);
+                rightFrontMotor.setPower((Math.cos(ang) + Math.sin(ang)) * strafePower);
+                leftRearMotor.setPower((Math.cos(ang) + Math.sin(ang)) * strafePower);
+                rightRearMotor.setPower((Math.cos(ang) - Math.sin(ang)) * strafePower);
+
+                Log.d("catbot", String.format("strafe LF: %.2f;  RF: %.2f;  LB: %.2f;  RB: %.2f  ; targetY: %.2f ; currentY %.2f ; targetX %.2f; currentX %.2f ",
+                        leftFrontMotor.getPower(), rightFrontMotor.getPower(), leftRearMotor.getPower(), rightRearMotor.getPower(),
+                        targety, globalPositionUpdate.returnYInches(), targetx, globalPositionUpdate.returnXInches()));
+
+
                 break;
         }
 

@@ -37,6 +37,8 @@ public class CatPositionUpdate implements Runnable{
     private int verticalRightEncoderPositionMultiplier = 1;
     private int normalEncoderPositionMultiplier = 1;
 
+    private  double count_per_in;
+
     /**
      * Constructor for GlobalCoordinatePosition Thread
      * @param verticalEncoderLeft left odometry encoder, facing the vertical direction
@@ -45,6 +47,7 @@ public class CatPositionUpdate implements Runnable{
      * @param threadSleepDelay delay in milliseconds for the GlobalPositionUpdate thread (50-75 milliseconds is suggested)
      */
     public CatPositionUpdate(DcMotor verticalEncoderLeft, DcMotor verticalEncoderRight, DcMotor horizontalEncoder, double COUNTS_PER_INCH, int threadSleepDelay){
+        count_per_in = COUNTS_PER_INCH;
         this.verticalEncoderLeft = verticalEncoderLeft;
         this.verticalEncoderRight = verticalEncoderRight;
         this.horizontalEncoder = horizontalEncoder;
@@ -57,6 +60,7 @@ public class CatPositionUpdate implements Runnable{
 
     public CatPositionUpdate(DcMotor verticalEncoderLeft, DcMotor verticalEncoderRight, DcMotor horizontalEncoder, double COUNTS_PER_INCH, double startingX,
                              double startingY, double startingOrientation, int threadSleepDelay){
+        count_per_in = COUNTS_PER_INCH;
         this.verticalEncoderLeft = verticalEncoderLeft;
         this.verticalEncoderRight = verticalEncoderRight;
         this.horizontalEncoder = horizontalEncoder;
@@ -102,6 +106,10 @@ public class CatPositionUpdate implements Runnable{
         previousVerticalRightEncoderWheelPosition = verticalRightEncoderWheelPosition;
         prevNormalEncoderWheelPosition = normalEncoderWheelPosition;
     }
+
+    public double returnXInches(){ return robotGlobalXCoordinatePosition/count_per_in; }
+
+    public double returnYInches(){ return robotGlobalYCoordinatePosition/ count_per_in; }
 
     /**
      * Returns the robot's global x coordinate
