@@ -109,7 +109,7 @@ public class CatPositionUpdate implements Runnable{
 
     public double returnXInches(){ return robotGlobalXCoordinatePosition/count_per_in; }
 
-    public double returnYInches(){ return robotGlobalYCoordinatePosition/ count_per_in; }
+    public double returnYInches(){ return robotGlobalYCoordinatePosition/count_per_in; }
 
     /**
      * Returns the robot's global x coordinate

@@ -14,7 +14,7 @@ import java.io.File;
  * Odometry system calibration. Run this OpMode to generate the necessary constants to calculate the robot's global position on the field.
  * The Global Positioning Algorithm will not function and will throw an error if this program is not run first
  */
-@TeleOp(name = "Odometry System Cat Odometry", group = "Calibration")
+@TeleOp(name = "Cat Odometry Calibrate", group = "Calibration")
 public class CatOdometryCal extends LinearOpMode {
     /* Declare OpMode members. */
     private ElapsedTime elapsedGameTime = new ElapsedTime();
@@ -81,9 +81,10 @@ public class CatOdometryCal extends LinearOpMode {
 
         double verticalEncoderTickOffsetPerDegree = encoderDifference/angle;
 
-        double wheelBaseSeparation = (2*90*verticalEncoderTickOffsetPerDegree)/(Math.PI*robot.drive.ODO_COUNTS_PER_INCH);
+        double wheelBaseSeparation = (2*angle*verticalEncoderTickOffsetPerDegree)/(Math.PI*robot.drive.ODO_COUNTS_PER_INCH);
 
-        horizontalTickOffset = robot.drive.backOdometry.getCurrentPosition()/Math.toRadians(robot.drive.getCurrentAngle());
+        // Negated this numberto move the robot center to the actual center instead of behind it
+        horizontalTickOffset = -robot.drive.backOdometry.getCurrentPosition()/Math.toRadians(robot.drive.getCurrentAngle());
 
         //Write the constants to text files
         ReadWriteFile.writeFile(wheelBaseSeparationFile, String.valueOf(wheelBaseSeparation));

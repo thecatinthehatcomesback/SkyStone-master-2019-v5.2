@@ -70,8 +70,8 @@ public class CatDriveHW extends CatSubsystemHW
     ElapsedTime runTime = new ElapsedTime();
     double      timeout = 0;
 
-    double          targetx;
-    double          targety;
+    double targetX;
+    double targetY;
     double          strafePower;
     int             targetAngleZ;
     int             baseDelta;
@@ -160,6 +160,8 @@ public class CatDriveHW extends CatSubsystemHW
         rightFrontMotor.setDirection(DcMotor.Direction.FORWARD);
         leftRearMotor.setDirection(DcMotor.Direction.FORWARD);
         rightRearMotor.setDirection(DcMotor.Direction.REVERSE);
+
+        // Define motor zero power behavior //
         leftFrontMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightFrontMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftRearMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -191,7 +193,7 @@ public class CatDriveHW extends CatSubsystemHW
         currentMethod = DRIVE_METHOD.vertical;
 
         //odomentry setup
-        globalPositionUpdate = new CatPositionUpdate(leftOdometry, rightOdometry, backOdometry, ODO_COUNTS_PER_INCH, 75);
+        globalPositionUpdate = new CatPositionUpdate(leftOdometry, rightOdometry, backOdometry, ODO_COUNTS_PER_INCH, 25);
         Thread positionThread = new Thread(globalPositionUpdate);
         positionThread.start();
     }
@@ -544,9 +546,11 @@ public class CatDriveHW extends CatSubsystemHW
         currentMethod = DRIVE_METHOD.strafe;
         timeout = timeoutS;
         isDone = false;
-        targetx = x;
-        targety = y;
+        targetX = x;
+        targetY = y;
         strafePower = power;
+
+        runTime.reset();
     }
     /**
      * ---   ___________   ---
@@ -587,6 +591,7 @@ public class CatDriveHW extends CatSubsystemHW
     public boolean isDone() {
         boolean keepDriving = true;
         if ((runTime.seconds() > timeout)) {
+            Log.d("catbot", "Timed out.");
             keepDriving = false;
         }
         switch (currentMethod){
@@ -661,26 +666,29 @@ public class CatDriveHW extends CatSubsystemHW
 
             case strafe:
 
+                double getY = globalPositionUpdate.returnYInches();
+                double getX = globalPositionUpdate.returnXInches();
+                double getTheta = globalPositionUpdate.returnOrientation();
+
                 // if is good to end
-                if (Math.abs(targety-globalPositionUpdate.returnYInches()) < 1 && Math.abs(targetx-globalPositionUpdate.returnXInches()) < 1) {
+                if (Math.abs(targetY - getY) < 2 && Math.abs(targetX - getX) < 2) {
 
                     keepDriving = false;
                 }
 
-                //calc angle
-                //double ang = (Math.atan2(targety - globalPositionUpdate.returnYInches(), targetx - globalPositionUpdate.returnXInches())) - globalPositionUpdate.returnOrientation();
-                double ang = 0.785398;
-                Log.d("catbot", String.format("move ang %f", ang ));
+                //calc angle  - globalPositionUpdate.returnOrientation()
+                double ang = (Math.atan2(targetX - getX, targetY - getY));
+                double ang2 = ang - Math.toRadians(getTheta);
+                //double ang = 0.785398;
 
-                leftFrontMotor.setPower((Math.cos(ang) - Math.sin(ang))* strafePower);
-                rightFrontMotor.setPower((Math.cos(ang) + Math.sin(ang)) * strafePower);
-                leftRearMotor.setPower((Math.cos(ang) + Math.sin(ang)) * strafePower);
-                rightRearMotor.setPower((Math.cos(ang) - Math.sin(ang)) * strafePower);
+                leftFrontMotor.setPower((Math.cos(ang2)  + Math.sin(ang2)) * strafePower);
+                rightFrontMotor.setPower((Math.cos(ang2) - Math.sin(ang2)) * strafePower);
+                leftRearMotor.setPower((Math.cos(ang2)   - Math.sin(ang2)) * strafePower);
+                rightRearMotor.setPower((Math.cos(ang2)  + Math.sin(ang2)) * strafePower);
 
-                Log.d("catbot", String.format("strafe LF: %.2f;  RF: %.2f;  LB: %.2f;  RB: %.2f  ; targetY: %.2f ; currentY %.2f ; targetX %.2f; currentX %.2f ",
+                Log.d("catbot", String.format("strafe LF: %.2f;  RF: %.2f;  LR: %.2f;  RR: %.2f  ; targetX/Y: %.2f %.2f ; currentX/Y %.2f %.2f ; calc/calc2/current angle: %.1f %.1f %.1f",
                         leftFrontMotor.getPower(), rightFrontMotor.getPower(), leftRearMotor.getPower(), rightRearMotor.getPower(),
-                        targety, globalPositionUpdate.returnYInches(), targetx, globalPositionUpdate.returnXInches()));
-
+                        targetX, targetY, getX, getY, Math.toDegrees(ang), Math.toDegrees(ang2), getTheta));
 
                 break;
         }

@@ -164,22 +164,20 @@ public class MecAutonomousLevel2_strafe extends LinearOpMode {
         robot.drive.IMUinit();
 
         /* Go! */
-        if (isBuildZone) {
-            driveBuildZone();
-        } else {
-            driveLoadingZone();
-        }
+        driveLoadingZone();
     }
     public void driveLoadingZone() throws InterruptedException {
 
-        robot.drive.strafeDrive(15,15,.35,5);
+        robot.drive.strafeDrive(0,88,.60,5);
         robot.drive.waitUntilDone();
 
-    }
-    public void driveBuildZone() throws InterruptedException {
-
-        robot.drive.strafeDrive(15,15,.35,5);
+        robot.drive.strafeDrive(65,88,.60,5);
         robot.drive.waitUntilDone();
 
+        robot.drive.strafeDrive(65,0,.60,5);
+        robot.drive.waitUntilDone();
+
+        robot.drive.strafeDrive(0,0,.60,5);
+        robot.drive.waitUntilDone();
     }
 }
