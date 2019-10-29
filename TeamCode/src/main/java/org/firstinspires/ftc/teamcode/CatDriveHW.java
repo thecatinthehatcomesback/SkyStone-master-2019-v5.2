@@ -70,9 +70,12 @@ public class CatDriveHW extends CatSubsystemHW
     ElapsedTime runTime = new ElapsedTime();
     double      timeout = 0;
 
-    double targetX;
-    double targetY;
+    double          targetX;
+    double          targetY;
     double          strafePower;
+    double          strafeAngle;
+    double          strafeTurnPower;
+
     int             targetAngleZ;
     int             baseDelta;
     boolean         clockwiseTurn;
@@ -541,7 +544,7 @@ public class CatDriveHW extends CatSubsystemHW
          }
     }
 
-    public void strafeDrive(double x, double y, double power, double timeoutS){
+    public void strafeDrive(double x, double y, double power, double angle, double turnSpeed, double timeoutS){
 
         currentMethod = DRIVE_METHOD.strafe;
         timeout = timeoutS;
@@ -549,9 +552,14 @@ public class CatDriveHW extends CatSubsystemHW
         targetX = x;
         targetY = y;
         strafePower = power;
+        strafeAngle = angle;
+        strafeTurnPower = turnSpeed;
+
+
 
         runTime.reset();
     }
+
     /**
      * ---   ___________   ---
      * ---   IMU Methods   ---
@@ -671,7 +679,7 @@ public class CatDriveHW extends CatSubsystemHW
                 double getTheta = globalPositionUpdate.returnOrientation();
 
                 // if is good to end
-                if (Math.abs(targetY - getY) < 2 && Math.abs(targetX - getX) < 2) {
+                if ((Math.abs(targetY - getY) < 2 && Math.abs(targetX - getX) < 2)  && ( Math.abs(getTheta - strafeAngle) < 5|| (Math.abs(getTheta - (strafeAngle + 360)) < 5))) {
 
                     keepDriving = false;
                 }
@@ -681,10 +689,79 @@ public class CatDriveHW extends CatSubsystemHW
                 double ang2 = ang - Math.toRadians(getTheta);
                 //double ang = 0.785398;
 
-                leftFrontMotor.setPower((Math.cos(ang2)  + Math.sin(ang2)) * strafePower);
-                rightFrontMotor.setPower((Math.cos(ang2) - Math.sin(ang2)) * strafePower);
-                leftRearMotor.setPower((Math.cos(ang2)   - Math.sin(ang2)) * strafePower);
-                rightRearMotor.setPower((Math.cos(ang2)  + Math.sin(ang2)) * strafePower);
+                double lFrontPower = (Math.cos(ang2)  + Math.sin(ang2));
+                double rFrontPower = (Math.cos(ang2) - Math.sin(ang2));
+                double lBackPower;
+                double rBackPower;
+
+
+/*
+                if ( Math.abs(lFrontPower) > Math.abs(rFrontPower)){
+                    //if lFrontPower is greater than right
+                    lFrontPower = (1 / Math.abs(lFrontPower)) * lFrontPower;
+                    rFrontPower = (1 / Math.abs(lFrontPower)) * rFrontPower;
+                }
+                else {
+                    //if rFrontPower is greater than left
+                    lFrontPower = (1 / Math.abs(rFrontPower)) * lFrontPower;
+                    rFrontPower = (1 / Math.abs(rFrontPower)) * rFrontPower;
+                }
+
+
+ */
+                lBackPower = rFrontPower;
+                rBackPower = lFrontPower;
+
+                //add turn here
+                if (Math.abs((getTheta - strafeAngle)) < Math.abs((getTheta - (strafeAngle + 360)))) {
+                    if ((getTheta - strafeAngle) < 0) {
+                        //turn right
+                        if (Math.abs(getTheta - strafeAngle) > 4) {
+                            rFrontPower = rFrontPower - strafeTurnPower;
+                            rBackPower = rBackPower - strafeTurnPower;
+                            lFrontPower = lFrontPower + strafeTurnPower;
+                            lBackPower = lBackPower + strafeTurnPower;
+                        }
+                    }
+                    else {
+                        //turn left
+                        if (Math.abs(getTheta - strafeAngle) > 4) {
+                            rFrontPower = rFrontPower + strafeTurnPower;
+                            rBackPower = rBackPower + strafeTurnPower;
+                            lFrontPower = lFrontPower - strafeTurnPower;
+                            lBackPower = lBackPower - strafeTurnPower;
+                        }
+                        }
+                }
+                else {
+                    if ((getTheta - (strafeAngle + 360)) < 0) {
+                        //turn right
+                        if (Math.abs(getTheta - (strafeAngle + 360)) > 4) {
+                            rFrontPower = rFrontPower - strafeTurnPower;
+                            rBackPower = rBackPower - strafeTurnPower;
+                            lFrontPower = lFrontPower + strafeTurnPower;
+                            lBackPower = lBackPower + strafeTurnPower;
+                        }
+                    }
+                    else {
+                        //turn left
+                            if (Math.abs(getTheta - (strafeAngle + 360)) > 4) {
+                                rFrontPower = rFrontPower + strafeTurnPower;
+                                rBackPower = rBackPower + strafeTurnPower;
+                                lFrontPower = lFrontPower - strafeTurnPower;
+                                lBackPower = lBackPower - strafeTurnPower;
+                            }
+                    }
+                }
+                double scale = findScalor(lFrontPower, rFrontPower, lBackPower, rBackPower);
+
+
+
+
+                leftFrontMotor.setPower(lFrontPower * strafePower * scale);
+                rightFrontMotor.setPower(rFrontPower * strafePower * scale);
+                leftRearMotor.setPower(lBackPower * strafePower * scale);
+                rightRearMotor.setPower(rBackPower * strafePower * scale);
 
                 Log.d("catbot", String.format("strafe LF: %.2f;  RF: %.2f;  LR: %.2f;  RR: %.2f  ; targetX/Y: %.2f %.2f ; currentX/Y %.2f %.2f ; calc/calc2/current angle: %.1f %.1f %.1f",
                         leftFrontMotor.getPower(), rightFrontMotor.getPower(), leftRearMotor.getPower(), rightRearMotor.getPower(),

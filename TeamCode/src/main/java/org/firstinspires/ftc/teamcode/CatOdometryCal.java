@@ -27,7 +27,7 @@ public class CatOdometryCal extends LinearOpMode {
 
 
 
-    final double PIVOT_SPEED = -0.3;
+    final double PIVOT_SPEED = -0.27;
 
     double horizontalTickOffset = 0;
 
